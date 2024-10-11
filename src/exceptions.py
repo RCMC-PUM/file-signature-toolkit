@@ -1,0 +1,2 @@
+class PathFormatError(Exception):
+    pass
