@@ -8,8 +8,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 click = "^8.1.7"
-scp = "^0.15.0"
-python-dotenv = "^1.0.1"
 tqdm = "^4.66.5"
 
 

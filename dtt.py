@@ -1,10 +1,10 @@
+import json
 from collections import defaultdict
 from os.path import join
 from pathlib import Path
-import json
 
-from tqdm import tqdm
 import click
+from tqdm import tqdm
 
 from src.file import File
 
@@ -15,54 +15,14 @@ def cli():
 
 
 @cli.command()
-@click.option(
-    "-sp",
-    "--source-path",
-    required=True,
-    type=click.Path(exists=True, path_type=Path),
-    multiple=True,
-    help="Source path(s) to download.",
-)
-@click.option(
-    "-dp",
-    "--destination-path",
-    required=True,
-    type=click.Path(exists=True, path_type=Path),
-    help="Destination path(s) to save.",
-)
-def download():
-    click.echo("Downloading")
-
-
-@cli.command()
-@click.option(
-    "-sp",
-    "--source-path",
-    required=True,
-    type=click.Path(exists=True, path_type=Path),
-    multiple=True,
-    help="Source path(s) to download.",
-)
-@click.option(
-    "-dp",
-    "--destination-path",
-    required=True,
-    type=click.Path(exists=True, path_type=Path),
-    help="Destination path(s) to save.",
-)
-def upload():
-    click.echo("Uploading")
-
-
-@cli.command()
 @click.argument(
     "files",
     required=True,
     type=click.Path(exists=True, path_type=Path),
     nargs=-1,
 )
-def generate_checksums(files: tuple[Path]):
-    for path in tqdm(files, desc="Creating checksum for inputted files"):
+def generate_fingerprint(files: tuple[Path]):
+    for path in tqdm(files, desc="Creating fingerprint"):
         file = File(path)
         file.calculate_file_checksum()
         file.save_metadata()
@@ -77,7 +37,7 @@ def generate_checksums(files: tuple[Path]):
     type=click.Path(exists=True, path_type=Path),
     nargs=-1,
 )
-def validate_checksums(files: tuple[Path]):
+def validate_fingerprint(files: tuple[Path]):
     metadata_files = {Path(join(file.parent, f"{file.stem}.json")) for file in files}
     stats = defaultdict(int)
 
@@ -89,7 +49,11 @@ def validate_checksums(files: tuple[Path]):
             expected_file = File(expected_file)
 
             checksum = expected_file.calculate_file_checksum()
-            validated = checksum == metadata["checksum"]
+            filesize = expected_file.size
+
+            validated = (checksum == metadata["checksum"]) and (
+                filesize == metadata["size"]
+            )
 
             if validated:
                 stats["PASSED"] += 1
