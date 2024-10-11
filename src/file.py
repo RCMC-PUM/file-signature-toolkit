@@ -22,12 +22,11 @@ def check_file_path(path: Any) -> Path:
 
 
 class File:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path | str):
         self.path = check_file_path(path)
         self.name = self.path.name
         self.format = self.path.suffix
-        self.hash_val = None
-        self.hash_file = None
+        self.checksum = None
         self.hash_function = "md5"
         self.size = os.path.getsize(self.path)
 
@@ -42,17 +41,16 @@ class File:
         instance.path = Path(data['path'])
         instance.name = data['name']
         instance.format = data['format']
-        instance.hash_val = data.get('hash_val')
-        instance.hash_file = Path(data.get('hash_file'))
-        instance.hash_function = data.get('hash_function', 'md5')
+        instance.checksum = data['checksum']
+        instance.hash_function = data['hash_function']
         instance.size = data['size']
 
         return instance
 
     def __eq__(self, file: File) -> bool:
-        return self.hash_val == file.hash_val
+        return self.checksum == file.checksum
 
-    def calculate_file_hash(self, chunk_size: int = 8192) -> str:
+    def calculate_file_checksum(self, chunk_size: int = 8192) -> str:
         """Calculate the hash of a file using the specified hash function."""
         hash_func = hashlib.new(self.hash_function)
 
@@ -60,26 +58,18 @@ class File:
             while chunk := file.read(chunk_size):
                 hash_func.update(chunk)
 
-        hash_val = hash_func.hexdigest()
-        self.hash_val = hash_val
-        return hash_val
+        checksum = hash_func.hexdigest()
+        self.checksum = checksum
+        return checksum
 
-    def save_hash_file(self) -> None:
-        path = Path(join(self.path.parent, f"{self.path.stem}.hash"))
+    def compare_to_checksum(self, checksum: str) -> bool:
+        return self.checksum == checksum
 
-        with open(path, "w") as file:
-            file.write(self.hash_val)
-
-        self.hash_file = path
-
-    def compare_to_hash(self, hash_val: str) -> bool:
-        return self.hash_val == hash_val
-
-    def compare_to_hash_file(self, hash_file: Path) -> bool:
-        check_file_path(hash_file)
-        with open(hash_file, "r") as handle:
-            hash_val = handle.read()
-        return self.hash_val == hash_val
+    def compare_to_checksum_file(self, metadata: Path) -> bool:
+        check_file_path(metadata)
+        with open(metadata, "r") as handle:
+            checksum = json.load(handle)["checksum"]
+        return self.checksum == checksum
 
     @property
     def metadata(self) -> dict:
@@ -90,7 +80,5 @@ class File:
         data = self.__dict__
 
         data["path"] = str(data["path"])
-        data["hash_file"] = str(data["hash_file"])
-
         with open(path, "w") as handle:
             json.dump(self.__dict__, handle)
