@@ -7,11 +7,6 @@ import hashlib
 from pathlib import Path
 import json
 
-from paramiko import SSHClient
-from scp import SCPClient
-
-from .exceptions import PathFormatError
-
 
 def check_file_path(path: Any) -> Path:
     if not isinstance(path, Path):
@@ -38,12 +33,12 @@ class File:
             data = json.load(handle)
 
         instance = cls.__new__(cls)
-        instance.path = Path(data['path'])
-        instance.name = data['name']
-        instance.format = data['format']
-        instance.checksum = data['checksum']
-        instance.hash_function = data['hash_function']
-        instance.size = data['size']
+        instance.path = Path(data["path"])
+        instance.name = data["name"]
+        instance.format = data["format"]
+        instance.checksum = data["checksum"]
+        instance.hash_function = data["hash_function"]
+        instance.size = data["size"]
 
         return instance
 

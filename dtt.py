@@ -1,14 +1,12 @@
 from collections import defaultdict
-from os.path import join, exists
+from os.path import join
 from pathlib import Path
-from glob import glob
 import json
 
 from tqdm import tqdm
 import click
 
 from src.file import File
-from src.exceptions import FilesNotMatch
 
 
 @click.group()
@@ -95,13 +93,26 @@ def validate_checksums(files: tuple[Path]):
 
             if validated:
                 stats["PASSED"] += 1
-                click.echo(click.style(f"File {expected_file.name} integrity test PASSED", fg="green"))
+                click.echo(
+                    click.style(
+                        f"File {expected_file.name} integrity test PASSED", fg="green"
+                    )
+                )
             else:
                 stats["FAILED"] += 1
-                click.echo(click.style(f"File {expected_file.name} integrity test FAILED", fg="red"))
+                click.echo(
+                    click.style(
+                        f"File {expected_file.name} integrity test FAILED", fg="red"
+                    )
+                )
 
     click.echo(click.style("SUMMARY:", bold=True))
-    click.echo(click.style(f"Files passing integrity test: {stats['PASSED']} / {len(metadata_files)}", bold=True))
+    click.echo(
+        click.style(
+            f"Files passing integrity test: {stats['PASSED']} / {len(metadata_files)}",
+            bold=True,
+        )
+    )
 
 
 if __name__ == "__main__":
