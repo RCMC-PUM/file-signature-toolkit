@@ -1,4 +1,6 @@
 ## File Signature Toolkit
+![Python versions](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)
+
 ### Overview
 The File Signature Toolkit is a CLI-based tool that provides utilities for generating, validating, and comparing file signatures based on their cryptographic hash values. The tool is designed to ensure file integrity, detect modifications, and assist in file comparison using various hash algorithms.
 
