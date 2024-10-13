@@ -64,7 +64,11 @@ def generate_file_signature(files: tuple[Path], batch_size: int, hash_function: 
     help="The number of bytes to read in single run. This allows to avoid loading whole file at once.",
 )
 def validate_file_signature(files: tuple[Path], batch_size):
-    signatures = {Path(join(file.parent, f"{file.name}.sign")) for file in files if file.suffix != ".sign"}
+    signatures = {
+        Path(join(file.parent, f"{file.name}.sign"))
+        for file in files
+        if file.suffix != ".sign"
+    }
     stats = defaultdict(int)
 
     for signature_file in signatures:
@@ -142,9 +146,13 @@ def compare_two_files(file_one, file_two, batch_size, hash_function):
     status = file_one == file_two
 
     if status:
-        click.echo(click.style(f"File {file_one.path} == File {file_two.path}", fg="green"))
+        click.echo(
+            click.style(f"File {file_one.path} == File {file_two.path}", fg="green")
+        )
     else:
-        click.echo(click.style(f"File {file_one.path} != File {file_two.path}", fg="red"))
+        click.echo(
+            click.style(f"File {file_one.path} != File {file_two.path}", fg="red")
+        )
 
 
 @cli.command()
@@ -156,8 +164,9 @@ def compare_two_files(file_one, file_two, batch_size, hash_function):
 )
 @click.option(
     "--signature-file",
-    "-s", required=True,
-    type=click.Path(exists=True, path_type=Path)
+    "-s",
+    required=True,
+    type=click.Path(exists=True, path_type=Path),
 )
 @click.option(
     "--batch-size",
@@ -179,7 +188,12 @@ def find_file_matching_signature(files, signature_file, batch_size):
             matched_files.append(file)
 
     for file in matched_files:
-        click.echo(click.style(f"Signature of file {file.path} matches signature of provided file: {signature_file}", fg="green"))
+        click.echo(
+            click.style(
+                f"Signature of file {file.path} matches signature of provided file: {signature_file}",
+                fg="green",
+            )
+        )
 
     click.echo(click.style("DONE", bold=True))
 
