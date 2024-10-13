@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "data-transfer-tool"
+name = "file-signature-toolkit"
 version = "0.1.0"
 description = ""
 authors = ["Jan Binkowski <jan.binkowski@pum.edu.pl>"]

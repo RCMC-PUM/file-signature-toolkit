@@ -17,12 +17,12 @@ def check_file_path(path: Any) -> Path:
 
 
 class File:
-    def __init__(self, path: Path | str):
+    def __init__(self, path: Path | str, hash_function: str):
         self.path = check_file_path(path)
         self.name = self.path.name
         self.format = self.path.suffix
         self.checksum = None
-        self.hash_function = "md5"
+        self.hash_function = hash_function
         self.size = os.path.getsize(self.path)
 
     @classmethod
@@ -33,7 +33,7 @@ class File:
             data = json.load(handle)
 
         instance = cls.__new__(cls)
-        instance.path = Path(data["path"])
+        instance.path = ""
         instance.name = data["name"]
         instance.format = data["format"]
         instance.checksum = data["checksum"]
@@ -45,12 +45,12 @@ class File:
     def __eq__(self, file: File) -> bool:
         return self.checksum == file.checksum
 
-    def calculate_file_checksum(self, chunk_size: int = 8192) -> str:
+    def calculate_file_checksum(self, batch_size: int) -> str:
         """Calculate the hash of a file using the specified hash function."""
         hash_func = hashlib.new(self.hash_function)
 
         with open(self.path, "rb") as file:
-            while chunk := file.read(chunk_size):
+            while chunk := file.read(batch_size):
                 hash_func.update(chunk)
 
         checksum = hash_func.hexdigest()
@@ -67,13 +67,12 @@ class File:
         return self.checksum == checksum
 
     @property
-    def metadata(self) -> dict:
+    def signature(self) -> dict:
         return self.__dict__
 
-    def save_metadata(self) -> None:
-        path = join(self.path.parent, f"{self.path.stem}.json")
-        data = self.__dict__
+    def save_signature(self) -> None:
+        path = join(self.path.parent, f"{self.path.name}.sign")
+        data = {key: val for key, val in self.__dict__.items() if not key == "path"}
 
-        data["path"] = str(data["path"])
         with open(path, "w") as handle:
-            json.dump(self.__dict__, handle)
+            json.dump(data, handle)
