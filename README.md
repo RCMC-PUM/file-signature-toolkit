@@ -3,6 +3,7 @@
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 ![Static Badge](https://img.shields.io/badge/code_style-black-black)
 ![Static Badge](https://img.shields.io/badge/license-Apache_2.0-yellow)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/RCMC-PUM/file-signature-toolkit/python-app.yml)
 
 ### Overview
 The File Signature Toolkit is a CLI-based tool that provides utilities for generating, validating, and comparing file signatures based on their cryptographic hash values. The tool is designed to ensure file integrity, detect modifications, and assist in file comparison using various hash algorithms.
