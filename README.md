@@ -19,7 +19,7 @@ The toolkit is built using Python and utilizes the click library for the CLI int
 
 #### Requirements
 - Python 3.10 or higher
-- Poetry (for dependency management)
+- Poetry
 
 #### Steps
    1. Clone the repository:
