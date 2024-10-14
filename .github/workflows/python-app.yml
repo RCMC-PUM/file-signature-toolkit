@@ -30,5 +30,4 @@ jobs:
         poetry install
     - name: Test with pytest
       run: |
-        poetry shell
-        pytest tests.py
+        poetry run pytest tests.py
