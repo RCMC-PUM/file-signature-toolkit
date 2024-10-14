@@ -22,20 +22,20 @@ The toolkit is built using Python and utilizes the click library for the CLI int
 - Poetry
 
 #### Steps
-1.Clone the repository:
+Clone the repository:
 
 ```
 git clone https://github.com/yourusername/file-signature-toolkit.git
 cd file-signature-toolkit
 ```
 
-2. Install dependencies using Poetry:
+Install dependencies using Poetry:
 
 ```   
 poetry install
 ``` 
 
-3. Activate the virtual environment:
+Activate the virtual environment:
 
 ```
 poetry shell
