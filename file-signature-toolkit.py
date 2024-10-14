@@ -1,7 +1,7 @@
 import json
+from collections import defaultdict
 from os.path import join
 from pathlib import Path
-from collections import defaultdict
 
 import click
 from tqdm import tqdm
@@ -30,7 +30,7 @@ def cli():
 )
 @click.option(
     "--hash-function",
-    "-t",
+    "-f",
     type=click.Choice(
         ["md5", "sha1", "sha224", "sha256", "sha384", "sha512"], case_sensitive=False
     ),
@@ -38,7 +38,9 @@ def cli():
     show_default=True,
     help="Type of hash algorithm to use.",
 )
-def generate_file_signature(files: tuple[Path], batch_size: int, hash_function: str):
+def generate_file_signature(
+    files: tuple[Path], batch_size: int, hash_function: str
+) -> None:
     files = [file for file in files if not file.suffix == ".sign"]
 
     for path in tqdm(files, desc="Creating file signature"):
@@ -63,7 +65,7 @@ def generate_file_signature(files: tuple[Path], batch_size: int, hash_function: 
     show_default=True,
     help="The number of bytes to read in single run. This allows to avoid loading whole file at once.",
 )
-def validate_file_signature(files: tuple[Path], batch_size):
+def validate_file_signature(files: tuple[Path], batch_size: int) -> None:
     signatures = {
         Path(join(file.parent, f"{file.name}.sign"))
         for file in files
@@ -72,7 +74,7 @@ def validate_file_signature(files: tuple[Path], batch_size):
     stats = defaultdict(int)
 
     for signature_file in signatures:
-        with open(signature_file, "r") as handle:
+        with open(signature_file, "r", encoding="utf-8") as handle:
             metadata = json.load(handle)
             hash_function = metadata["hash_function"]
 
@@ -128,7 +130,7 @@ def validate_file_signature(files: tuple[Path], batch_size):
 )
 @click.option(
     "--hash-function",
-    "-t",
+    "-f",
     type=click.Choice(
         ["md5", "sha1", "sha224", "sha256", "sha384", "sha512"], case_sensitive=False
     ),
@@ -136,7 +138,9 @@ def validate_file_signature(files: tuple[Path], batch_size):
     show_default=True,
     help="Type of hash algorithm to use.",
 )
-def compare_two_files(file_one, file_two, batch_size, hash_function):
+def compare_two_files(
+    file_one: Path, file_two: Path, batch_size: int, hash_function: str
+) -> None:
     file_one = File(file_one, hash_function)
     file_one.calculate_file_checksum(batch_size)
 
@@ -175,17 +179,22 @@ def compare_two_files(file_one, file_two, batch_size, hash_function):
     show_default=True,
     help="The number of bytes to read in single run. This allows to avoid loading whole file at once.",
 )
-def find_file_matching_signature(files, signature_file, batch_size):
+def find_file_matching_signature(
+    files: list[Path], signature_file: Path, batch_size: int
+) -> None:
     signature = File.load_from_json(signature_file)
     hash_function = signature.hash_function
 
     matched_files = []
     for file in tqdm(files, desc="Searching"):
         file = File(file, hash_function)
-        checksum = file.calculate_file_checksum(batch_size)
 
-        if signature.checksum == checksum:
-            matched_files.append(file)
+        if signature.size == file.size:
+            # First compare file size to reduce number of hash calculations
+            checksum = file.calculate_file_checksum(batch_size)
+
+            if signature.checksum == checksum:
+                matched_files.append(file)
 
     for file in matched_files:
         click.echo(

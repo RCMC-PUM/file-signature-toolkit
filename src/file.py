@@ -26,10 +26,10 @@ class File:
         self.size = os.path.getsize(self.path)
 
     @classmethod
-    def load_from_json(cls, path: Path):
+    def load_from_json(cls, path: Path | str) -> File:
         path = check_file_path(path)
 
-        with open(path, "r") as handle:
+        with open(path, "r", encoding="utf-8") as handle:
             data = json.load(handle)
 
         instance = cls.__new__(cls)
@@ -49,7 +49,7 @@ class File:
         """Calculate the hash of a file using the specified hash function."""
         hash_func = hashlib.new(self.hash_function)
 
-        with open(self.path, "rb") as file:
+        with open(self.path, "rb", encoding=None) as file:
             while chunk := file.read(batch_size):
                 hash_func.update(chunk)
 
@@ -60,9 +60,9 @@ class File:
     def compare_to_checksum(self, checksum: str) -> bool:
         return self.checksum == checksum
 
-    def compare_to_checksum_file(self, metadata: Path) -> bool:
-        check_file_path(metadata)
-        with open(metadata, "r") as handle:
+    def compare_to_checksum_file(self, signature: Path) -> bool:
+        check_file_path(signature)
+        with open(signature, "r", encoding="utf-8") as handle:
             checksum = json.load(handle)["checksum"]
         return self.checksum == checksum
 
@@ -74,5 +74,5 @@ class File:
         path = join(self.path.parent, f"{self.path.name}.sign")
         data = {key: val for key, val in self.__dict__.items() if not key == "path"}
 
-        with open(path, "w") as handle:
+        with open(path, "w", encoding="utf-8") as handle:
             json.dump(data, handle)
