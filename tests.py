@@ -1,8 +1,9 @@
-from os.path import join
-import pytest
 import json
-
+from os.path import join
 from pathlib import Path
+
+import pytest
+
 from src.file import File
 
 # Constants
@@ -52,7 +53,9 @@ def test_compare_two_files(file_one, file_two):
     file_one_checksum = file_one.calculate_file_checksum(BATCH_SIZE)
     file_two_checksum = file_two.calculate_file_checksum(BATCH_SIZE)
 
-    assert file_one_checksum != file_two_checksum  # File one and file two should have different checksums
+    assert (
+        file_one_checksum != file_two_checksum
+    )  # File one and file two should have different checksums
 
 
 def test_signature_validation(file_one):
@@ -63,7 +66,7 @@ def test_signature_validation(file_one):
     file_one.save_signature()
 
     # Manually load the saved signature and validate
-    with open(signature_path, "r") as signature_file:
+    with open(signature_path, "r", encoding="utf-8") as signature_file:
         metadata = json.load(signature_file)
 
     checksum_in_sign_file = metadata["checksum"]
@@ -71,7 +74,7 @@ def test_signature_validation(file_one):
     assert file_one.checksum == checksum_in_sign_file
 
 
-def test_find_file_matching_signature(file_one, tmpdir):
+def test_find_file_matching_signature(file_one):
     """Test finding a file that matches a pre-generated signature"""
     # Generate and save the signature for file_1
     file_one.calculate_file_checksum(BATCH_SIZE)
