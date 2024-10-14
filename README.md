@@ -35,7 +35,7 @@ cd file-signature-toolkit
 poetry install
 ``` 
 
-4. Activate the virtual environment:
+3. Activate the virtual environment:
 
 ```
 poetry shell
