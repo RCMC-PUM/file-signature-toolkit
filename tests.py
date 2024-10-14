@@ -90,3 +90,17 @@ def test_find_file_matching_signature(file_one):
     # Verify the file matches its own signature
     assert signature.checksum == file_1_checksum
     assert signature == file_one
+
+
+@pytest.mark.parametrize("file_to_compare,expected_status", [
+    (TEST_FILE_1, True),  # Should match with file_1.txt
+    (TEST_FILE_2, False)  # Should not match with file_2.txt
+])
+def test_parametrized_file_comparison(file_to_compare, expected_status, file_one):
+    """Test file comparison with parametrized files"""
+    file_one.calculate_file_checksum(BATCH_SIZE)
+
+    file_to_compare = File(file_to_compare, HASH_FUNCTION)
+    file_to_compare.calculate_file_checksum(BATCH_SIZE)
+
+    assert (file_one == file_to_compare) == expected_status
